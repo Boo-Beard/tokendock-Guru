@@ -6,6 +6,11 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
+
+    // serve static files directly instead of rewriting them to index.html
+    { "src": "/(css|js|assets|images)/(.*)", "dest": "/$1/$2" },
+
+    // everything else goes to index.html
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
