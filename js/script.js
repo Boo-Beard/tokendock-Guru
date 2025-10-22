@@ -1,6 +1,5 @@
 /* ========= INIT ========= */
 const API_BASE = '/api'; // local API route
-
 function initializeProject() {
   // Text & media
   document.title = `${PROJECT_CONFIG.name} Dock | TokenDock`;
