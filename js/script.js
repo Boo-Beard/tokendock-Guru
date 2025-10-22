@@ -66,11 +66,6 @@ if (ethRes.ok) {
   const eth = ethJson?.data;
   if (eth && eth.price != null) solPriceEl.textContent = `$${Number(eth.price).toFixed(2)}`;
 }
-      if (solRes.ok) {
-        const solJson = await solRes.json();
-        const sol = solJson?.data;
-        if (sol && sol.price != null) solPriceEl.textContent = `$${Number(sol.price).toFixed(2)}`;
-      }
     } catch (_) { solPriceEl.textContent = '—'; }
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
