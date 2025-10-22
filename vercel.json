@@ -2,6 +2,7 @@
   "version": 2,
   "builds": [
     { "src": "api/birdeye.js", "use": "@vercel/node" },
+    { "src": "api/guru.js", "use": "@vercel/node" },
     { "src": "index.html", "use": "@vercel/static" },
     { "src": "css/**", "use": "@vercel/static" },
     { "src": "js/**", "use": "@vercel/static" },
@@ -9,9 +10,20 @@
   ],
   "routes": [
     { "src": "/api/birdeye", "dest": "/api/birdeye.js" },
+    { "src": "/api/guru", "dest": "/api/guru.js" },
     { "src": "/css/(.*)", "dest": "/css/$1" },
     { "src": "/js/(.*)", "dest": "/js/$1" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://www.tokendock.io" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
   ]
 }
