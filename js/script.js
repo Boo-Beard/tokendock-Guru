@@ -32,9 +32,11 @@ async function loadGuruStats() {
     const json = await res.json();
     const d = json.data;
 
-    document.getElementById('tvl').textContent = d.tvl;
-    document.getElementById('investors').textContent = d.investors;
-    document.getElementById('funds').textContent = d.funds;
+document.getElementById('tvl').textContent = d.tvl;
+document.getElementById('investors').textContent = d.investors;
+document.getElementById('funds').textContent = d.funds;
+document.getElementById('gurus').textContent = d.gurus;
+
   } catch (err) {
     console.error('Guru stats load failed:', err);
   }
