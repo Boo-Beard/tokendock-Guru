@@ -1,5 +1,5 @@
 /* ========= INIT ========= */
-const API_BASE = '/api'; // local API route
+const API_BASE = 'https://tokendock-guru.vercel.app/api';
 function initializeProject() {
   // Text & media
   document.title = `${PROJECT_CONFIG.name} Dock | TokenDock`;
