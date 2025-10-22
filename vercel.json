@@ -9,6 +9,9 @@
   ],
   "routes": [
     { "src": "/api/birdeye", "dest": "/api/birdeye.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
