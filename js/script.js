@@ -1,5 +1,6 @@
 /* ========= INIT ========= */
-const API_BASE = '/api';
+const API_BASE = '/api'; // local API route
+
 function initializeProject() {
   // Text & media
   document.title = `${PROJECT_CONFIG.name} Dock | TokenDock`;
@@ -31,53 +32,53 @@ async function loadProjectStats() {
   const changeEl = document.getElementById('change');
   const holderEl = document.getElementById('holderCount');
   const lastUpdatedEl = document.getElementById('lastUpdated');
-  const solPriceEl = document.getElementById('solPrice');
+  const solPriceEl = document.getElementById('solPrice'); // still used as "ETH" price
 
   // Proper canvas sizing for crisp sparkline
   const canvas = document.getElementById('priceTrend');
   canvas.width = canvas.offsetWidth;
   canvas.height = 50;
 
-  function abbreviateNumber(num) {
+  // Helper functions
+  const abbreviateNumber = (num) => {
     if (num >= 1e9) return (num / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
     if (num >= 1e6) return (num / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
     if (num >= 1e3) return (num / 1e3).toFixed(2).replace(/\.?0+$/, '') + 'K';
     return (Number(num) || 0).toLocaleString();
-  }
+  };
 
-  function formatPrice(p) {
+  const formatPrice = (p) => {
     const price = Number(p || 0);
     if (price >= 1) return `$${price.toFixed(2).replace(/\.?0+$/, '')}`;
     if (price >= 0.01) return `$${price.toFixed(3).replace(/\.?0+$/, '')}`;
     return `$${price.toFixed(4).replace(/\.?0+$/, '')}`;
-  }
+  };
 
   try {
-    // Token stats
+    // 🧠 Fetch Ethereum token stats via your own API endpoint
+    const res = await fetch(`${API_BASE}/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
 
-const res = await fetch(`${API_BASE}/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
-
-
-    // SOL price (best-effort)
+    // 💰 Fetch ETH price (instead of SOL)
     try {
-const ethRes = await fetch(`${API_BASE}/birdeye?token=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`);
-if (ethRes.ok) {
-  const ethJson = await ethRes.json();
-  const eth = ethJson?.data;
-  if (eth && eth.price != null) solPriceEl.textContent = `$${Number(eth.price).toFixed(2)}`;
-}
-    } catch (_) { solPriceEl.textContent = '—'; }
+      const ethRes = await fetch(`${API_BASE}/birdeye?token=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`);
+      if (ethRes.ok) {
+        const ethJson = await ethRes.json();
+        const eth = ethJson?.data;
+        if (eth && eth.price != null) solPriceEl.textContent = `$${Number(eth.price).toFixed(2)}`;
+      }
+    } catch {
+      solPriceEl.textContent = '—';
+    }
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     if (!json.success || !json.data) throw new Error('Bad payload');
-
     const d = json.data;
 
     // Price + change
     const ch24 = Number(d.priceChange24hPercent || 0);
-    const arrow = ch24 >= 0 ? "▲" : "▼";
-    const arrowColor = ch24 >= 0 ? "#0EB466" : "#ff4d4d";
+    const arrow = ch24 >= 0 ? '▲' : '▼';
+    const arrowColor = ch24 >= 0 ? '#0EB466' : '#ff4d4d';
 
     priceEl.innerHTML = `${formatPrice(d.price)} <span style="color:${arrowColor}; font-size:0.8rem; margin-left:4px;">${arrow}</span>`;
     changeEl.textContent = `${ch24.toFixed(2)}%`;
@@ -97,19 +98,20 @@ if (ethRes.ok) {
       const scaleX = canvas.width / (points.length - 1 || 1);
       const scaleY = (max - min) === 0 ? 0 : canvas.height / (max - min);
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-      gradient.addColorStop(0, ch24 >= 0 ? "rgba(14,180,102,0)" : "rgba(255,77,77,0)");
-      gradient.addColorStop(0.5, ch24 >= 0 ? "rgba(14,180,102,1)" : "rgba(255,77,77,1)");
-      gradient.addColorStop(1, ch24 >= 0 ? "rgba(14,180,102,0)" : "rgba(255,77,77,0)");
+      gradient.addColorStop(0, ch24 >= 0 ? 'rgba(14,180,102,0)' : 'rgba(255,77,77,0)');
+      gradient.addColorStop(0.5, ch24 >= 0 ? 'rgba(14,180,102,1)' : 'rgba(255,77,77,1)');
+      gradient.addColorStop(1, ch24 >= 0 ? 'rgba(14,180,102,0)' : 'rgba(255,77,77,0)');
 
       ctx.beginPath();
       ctx.lineWidth = 5;
       ctx.strokeStyle = gradient;
       ctx.shadowBlur = 8;
-      ctx.shadowColor = ch24 >= 0 ? "rgba(14,180,102,0.6)" : "rgba(255,77,77,0.6)";
+      ctx.shadowColor = ch24 >= 0 ? 'rgba(14,180,102,0.6)' : 'rgba(255,77,77,0.6)';
       points.forEach((p, i) => {
         const x = i * scaleX;
         const y = canvas.height - ((p - min) * scaleY);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       });
       ctx.stroke();
     }
@@ -121,15 +123,14 @@ if (ethRes.ok) {
     lastUpdatedEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
 
   } catch (err) {
-    priceEl.textContent = mcapEl.textContent = volEl.textContent = holderEl.textContent = "Error";
     console.error(err);
+    priceEl.textContent = mcapEl.textContent = volEl.textContent = holderEl.textContent = 'Error';
   }
 }
 
 /* ========= COPY CONTRACT ========= */
 const copyBtn = document.getElementById('copyCA');
 copyBtn.addEventListener('click', async () => {
-  const notification = document.getElementById('notification');
   try {
     await navigator.clipboard.writeText(PROJECT_CONFIG.contractAddress);
     copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>Address Copied';
@@ -140,9 +141,6 @@ copyBtn.addEventListener('click', async () => {
     }, 1800);
   } catch (err) {
     console.error('Clipboard failed:', err);
-    notification.querySelector('p').innerHTML = "⚠️ Failed to copy address.";
-    notification.classList.add('show');
-    setTimeout(() => notification.classList.remove('show'), 1800);
   }
 });
 
