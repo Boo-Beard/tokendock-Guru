@@ -1,4 +1,5 @@
 /* ========= INIT ========= */
+const API_BASE = '/api';
 function initializeProject() {
   // Text & media
   document.title = `${PROJECT_CONFIG.name} Dock | TokenDock`;
@@ -54,12 +55,17 @@ async function loadProjectStats() {
   try {
     // Token stats
 
-    const res = await fetch(`https://tokendock-guru.vercel.app/api/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
+const res = await fetch(`${API_BASE}/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
 
 
     // SOL price (best-effort)
     try {
-      const solRes = await fetch(`https://dock-habitat.vercel.app/api/birdeye?token=sol`);
+const ethRes = await fetch(`${API_BASE}/birdeye?token=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`);
+if (ethRes.ok) {
+  const ethJson = await ethRes.json();
+  const eth = ethJson?.data;
+  if (eth && eth.price != null) solPriceEl.textContent = `$${Number(eth.price).toFixed(2)}`;
+}
       if (solRes.ok) {
         const solJson = await solRes.json();
         const sol = solJson?.data;
