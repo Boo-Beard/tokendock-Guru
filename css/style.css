@@ -39,13 +39,10 @@
   --border: rgba(255, 255, 255, 0.1);
 
   /* === GRADIENT BACKGROUND === */
---bg-solid: radial-gradient(
-  circle at 25% 15%,
-  color-mix(in oklab, #0a0f1c 70%, #0357df 30%) 0%,
-  color-mix(in oklab, #0357df 80%, #2b74ff 20%) 40%,
-  color-mix(in oklab, #ff0055 90%, #220011 10%) 100%
-);
-
+    --bg-solid: linear-gradient(to bottom,
+ color-mix(in oklab, #0357df 60%, #0a0f1c 40%) 0%,
+ color-mix(in oklab, #166fff 70%, #0a0f1c 30%) 60%,
+ color-mix(in oklab, #ff0040 50%, #0a0f1c 50%) 100%);
 }
 
 /* Core layout */

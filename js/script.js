@@ -1,5 +1,6 @@
 /* ========= INIT ========= */
 const API_BASE = 'https://tokendock-guru.vercel.app/api';
+
 function initializeProject() {
   // Text & media
   document.title = `${PROJECT_CONFIG.name} Dock | TokenDock`;
@@ -23,6 +24,22 @@ function initializeProject() {
     .join('');
 }
 
+/* ========= GURU FUND STATS ========= */
+async function loadGuruStats() {
+  try {
+    const res = await fetch(`${API_BASE}/guru`);
+    const json = await res.json();
+    if (!json.success || !json.data) throw new Error('Bad payload');
+
+    const { tvl, investors, funds } = json.data;
+    document.getElementById('tvl').textContent = tvl;
+    document.getElementById('investors').textContent = investors;
+    document.getElementById('funds').textContent = funds;
+  } catch (err) {
+    console.error('Guru stats load failed:', err);
+  }
+}
+
 /* ========= DATA FETCH / RENDER ========= */
 async function loadProjectStats() {
   const priceEl = document.getElementById('price');
@@ -31,33 +48,32 @@ async function loadProjectStats() {
   const changeEl = document.getElementById('change');
   const holderEl = document.getElementById('holderCount');
   const lastUpdatedEl = document.getElementById('lastUpdated');
-  const solPriceEl = document.getElementById('solPrice'); // still used as "ETH" price
+  const solPriceEl = document.getElementById('solPrice');
 
-  // Proper canvas sizing for crisp sparkline
+  // Canvas setup
   const canvas = document.getElementById('priceTrend');
   canvas.width = canvas.offsetWidth;
   canvas.height = 50;
 
-  // Helper functions
   const abbreviateNumber = (num) => {
-    if (num >= 1e9) return (num / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
-    if (num >= 1e6) return (num / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
-    if (num >= 1e3) return (num / 1e3).toFixed(2).replace(/\.?0+$/, '') + 'K';
+    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
     return (Number(num) || 0).toLocaleString();
   };
 
   const formatPrice = (p) => {
     const price = Number(p || 0);
-    if (price >= 1) return `$${price.toFixed(2).replace(/\.?0+$/, '')}`;
-    if (price >= 0.01) return `$${price.toFixed(3).replace(/\.?0+$/, '')}`;
-    return `$${price.toFixed(4).replace(/\.?0+$/, '')}`;
+    if (price >= 1) return `$${price.toFixed(2)}`;
+    if (price >= 0.01) return `$${price.toFixed(3)}`;
+    return `$${price.toFixed(4)}`;
   };
 
   try {
-    // 🧠 Fetch Ethereum token stats via your own API endpoint
+    // Fetch token stats
     const res = await fetch(`${API_BASE}/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
 
-    // 💰 Fetch ETH price (instead of SOL)
+    // Fetch ETH price
     try {
       const ethRes = await fetch(`${API_BASE}/birdeye?token=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`);
       if (ethRes.ok) {
@@ -79,7 +95,7 @@ async function loadProjectStats() {
     const arrow = ch24 >= 0 ? '▲' : '▼';
     const arrowColor = ch24 >= 0 ? '#0EB466' : '#ff4d4d';
 
-    priceEl.innerHTML = `${formatPrice(d.price)} <span style="color:${arrowColor}; font-size:0.8rem; margin-left:4px;">${arrow}</span>`;
+    priceEl.innerHTML = `${formatPrice(d.price)} <span style="color:${arrowColor}; font-size:0.8rem;">${arrow}</span>`;
     changeEl.textContent = `${ch24.toFixed(2)}%`;
     changeEl.style.color = arrowColor;
 
@@ -132,7 +148,7 @@ const copyBtn = document.getElementById('copyCA');
 copyBtn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(PROJECT_CONFIG.contractAddress);
-    copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>Address Copied';
+    copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Address Copied';
     copyBtn.style.color = '#ff0000ff';
     setTimeout(() => {
       copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
@@ -148,6 +164,7 @@ const refreshBtn = document.getElementById('refreshStats');
 refreshBtn.addEventListener('click', async () => {
   refreshBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Refreshing...`;
   await loadProjectStats();
+  await loadGuruStats();
   setTimeout(() => {
     refreshBtn.innerHTML = `<i class="fas fa-sync-alt"></i> Refresh`;
   }, 600);
@@ -157,4 +174,5 @@ refreshBtn.addEventListener('click', async () => {
 document.addEventListener('DOMContentLoaded', () => {
   initializeProject();
   loadProjectStats();
+  loadGuruStats();
 });
