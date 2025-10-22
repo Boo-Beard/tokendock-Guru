@@ -27,14 +27,14 @@ function initializeProject() {
 /* ========= GURU FUND STATS ========= */
 async function loadGuruStats() {
   try {
-    const res = await fetch(`${API_BASE}/guru`);
+    const res = await fetch('https://tokendock-guru.vercel.app/api/guru');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    if (!json.success || !json.data) throw new Error('Bad payload');
+    const d = json.data;
 
-    const { tvl, investors, funds } = json.data;
-    document.getElementById('tvl').textContent = tvl;
-    document.getElementById('investors').textContent = investors;
-    document.getElementById('funds').textContent = funds;
+    document.getElementById('tvl').textContent = d.tvl;
+    document.getElementById('investors').textContent = d.investors;
+    document.getElementById('funds').textContent = d.funds;
   } catch (err) {
     console.error('Guru stats load failed:', err);
   }
