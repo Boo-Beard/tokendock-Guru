@@ -10,7 +10,7 @@
   ],
   "routes": [
     { "src": "/api/birdeye", "dest": "/api/birdeye.js" },
-    { "src": "/api/guru", "dest": "/api/guru.js" },
+  { "src": "/api/guru", "dest": "/api/guru.js" }
     { "src": "/css/(.*)", "dest": "/css/$1" },
     { "src": "/js/(.*)", "dest": "/js/$1" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
