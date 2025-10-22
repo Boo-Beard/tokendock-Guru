@@ -1,19 +1,16 @@
 export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
   try {
-    // --- CORS headers ---
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-
-    // Fetch Guru data
     const response = await fetch('https://guru.fund/explore');
     const html = await response.text();
 
-    // Extract numbers using regex (faster than DOMParser)
+    // Extract data
     const tvlMatch = html.match(/\$[\d,]+\.\d{2}/);
     const numbers = [...html.matchAll(/<div class="text-3xl font-semibold">([\d,.$]+)<\/div>/g)];
 
@@ -21,11 +18,10 @@ export default async function handler(req, res) {
     const investors = numbers[1]?.[1] || '—';
     const funds = numbers[2]?.[1] || '—';
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
-      data: { tvl, investors, funds },
+      data: { tvl, investors, funds }
     });
-
   } catch (err) {
     console.error('Guru API proxy failed:', err);
     res.status(500).json({ success: false, message: 'Server error' });
