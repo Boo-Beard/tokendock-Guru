@@ -9,20 +9,14 @@
   ],
   "routes": [
     {
-      "handle": "headers"
-    },
-    {
       "src": "/api/(.*)",
+      "dest": "/api/$1.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
       }
     },
-    {
-      "handle": "filesystem"
-    },
-    { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/css/(.*)", "dest": "/css/$1" },
     { "src": "/js/(.*)", "dest": "/js/$1" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
