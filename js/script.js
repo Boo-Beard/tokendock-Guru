@@ -53,7 +53,9 @@ async function loadProjectStats() {
 
   try {
     // Token stats
-const res = await fetch(`https://tokendock-guru.vercel.app/api/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
+
+    const res = await fetch(`https://tokendock-guru.vercel.app/api/birdeye?token=${encodeURIComponent(PROJECT_CONFIG.contractAddress)}`);
+
 
     // SOL price (best-effort)
     try {
