@@ -1,4 +1,13 @@
-const API_BASE = "/api/birdeye";
+// Works on tokendock-guru.vercel.app (=> /api/birdeye)
+// and on www.tokendock.io/docks/guru/ (=> /docks/guru/api/birdeye)
+const API_BASE = (() => {
+  try {
+    const m = location.pathname.match(/^\/docks\/[^/]+/);
+    return (m ? `${m[0]}/api/birdeye` : '/api/birdeye');
+  } catch {
+    return '/api/birdeye';
+  }
+})();
 const SUPPORTED_CHAINS = [
   "solana", "ethereum", "bsc", "base", "arbitrum", "polygon", "optimism", "avalanche", "sui"
 ];

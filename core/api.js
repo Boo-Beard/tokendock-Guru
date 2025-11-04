@@ -1,6 +1,15 @@
 import { fetchWithTimeout, normalizeInterval, getCachedOHLCV, setCachedOHLCV } from './utils.js';
 
-const API_BASE = '/api/birdeye';
+// Works on tokendock-guru.vercel.app (=> /api/birdeye)
+// and on www.tokendock.io/docks/guru/ (=> /docks/guru/api/birdeye)
+const API_BASE = (() => {
+  try {
+    const m = location.pathname.match(/^\/docks\/[^/]+/);
+    return (m ? `${m[0]}/api/birdeye` : '/api/birdeye');
+  } catch {
+    return '/api/birdeye';
+  }
+})();
 
 export async function fetchTokenData(addr, chain) {
   const path = '/defi/token_overview';
