@@ -1,9 +1,0 @@
-{
-  "name": "tokendock-guru",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "echo 'Static site build complete'"
-  }
-}
