@@ -8,6 +8,14 @@ const API_BASE = (() => {
     return '/api/birdeye';
   }
 })();
+// Mount-aware base for /docks/* pages
+const MOUNT_BASE = (() => {
+  try {
+    const m = location.pathname.match(/^\/docks\/[^/]+/);
+    return m ? m[0] : '';
+  } catch { return ''; }
+})();
+
 const SUPPORTED_CHAINS = [
   "solana", "ethereum", "bsc", "base", "arbitrum", "polygon", "optimism", "avalanche", "sui"
 ];
@@ -1830,7 +1838,7 @@ async function loadGuruStats() {
     }
 
     // 2) Fetch with retry/backoff and timeout; prefer same-origin proxy if configured
-    const tryUrls = ['/guru', 'https://tokendock-guru.vercel.app/api/guru'];
+const tryUrls = [`${MOUNT_BASE}/api/guru`, 'https://tokendock-guru.vercel.app/api/guru'];
     let json = null;
     let lastErr = null;
     for (let attempt = 0; attempt < 3; attempt++) {
