@@ -1830,100 +1830,54 @@ async function hydrateFresh() {
 /* ========= GURU FUND STATS ========= */
 async function loadGuruStats() {
   try {
-    // 1) Ensure tiles exist (in case we were called before render completes)
-    const tilesReady = () => document.getElementById('tvl') && document.getElementById('investors') && document.getElementById('funds') && document.getElementById('gurus');
+    // Ensure tiles exist (avoid race if called before render)
+    const tilesReady = () =>
+      document.getElementById('tvl') &&
+      document.getElementById('investors') &&
+      document.getElementById('funds') &&
+      document.getElementById('gurus');
     if (!tilesReady()) {
       setTimeout(loadGuruStats, 250);
       return;
     }
 
-    // 2) Fetch with retry/backoff and timeout; prefer same-origin proxy if configured
-const tryUrls = [`${MOUNT_BASE}/api/guru`, 'https://tokendock-guru.vercel.app/api/guru'];
-    let json = null;
-    let lastErr = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      for (const u of tryUrls) {
-        try {
-          const r = (typeof fetchWithTimeout === 'function')
-            ? await fetchWithTimeout(u, { headers: { Accept: 'application/json' } }, 5000)
-            : await fetch(u, { headers: { Accept: 'application/json' } });
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          json = await r.json();
-          break;
-        } catch (e) {
-          lastErr = e;
-        }
-      }
-      if (json) break;
-      await new Promise(res => setTimeout(res, 300 * (attempt + 1)));
-    }
-    if (!json) throw lastErr || new Error('Guru fetch failed');
-    const root = json || {};
-    const d = (root && root.data) ? root.data : root;
-    try { console.debug('[Guru] payload', root); } catch {}
+    // Fetch from working TRPC endpoint (fast + reliable)
+    const url = 'https://trpc.guru.fund/dapp.getStats';
+    const r = (typeof fetchWithTimeout === 'function')
+      ? await fetchWithTimeout(url, { headers: { Accept: 'application/json' } }, 6000)
+      : await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    const d = j?.result?.data || {};
 
+    // Map fields
+    const ttvlRaw = Number(d.ttvl); // big integer-like as string
+    const funds = Number(d.funds);
+    const gurus = Number(d.gurus);
+    const investors = Number(d.activeInvestors ?? d.lifetimeInvestors);
+
+    // Scale TVL into USD units suitable for display
+    // Start with 1e6 (-> millions). If absurdly large, fallback to 1e5.
+    let tvlVal = isFinite(ttvlRaw) ? (ttvlRaw / 1e6) : null;
+    if (tvlVal != null && tvlVal >= 1e10) {
+      tvlVal = ttvlRaw / 1e5;
+    }
+
+    // DOM targets
     const tvlEl = document.getElementById('tvl');
     const invEl = document.getElementById('investors');
     const fundsEl = document.getElementById('funds');
     const gurusEl = document.getElementById('gurus');
 
-    const parseHumanNumber = (v) => {
-      if (v == null) return null;
-      const s0 = String(v).trim();
-      const s = s0.replace(/^[\$€£¥]/, '').trim();
-      const m = s.match(/^([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+(?:\.[0-9]+)?)([KMB])?$/i);
-      if (m) {
-        const base = Number(m[1].replace(/,/g, ''));
-        if (!isFinite(base)) return null;
-        const suf = (m[2] || '').toUpperCase();
-        const mult = suf === 'B' ? 1e9 : suf === 'M' ? 1e6 : suf === 'K' ? 1e3 : 1;
-        return base * mult;
-      }
-      const n = Number(s.replace(/[^0-9.\-]/g, ''));
-      return isFinite(n) ? n : null;
-    };
-    const getFirst = (obj, keys) => {
-      for (const k of keys) {
-        if (obj && obj[k] != null) return obj[k];
-      }
-      return undefined;
-    };
-
-    // Try nested first, then root-level fallbacks
-    const tvlRaw = getFirst(d, ['tvl','tvlUsd','tvl_usd','totalValueLocked','total_value_locked']);
-    const invRaw = getFirst(d, ['investors','users','wallets','holders']);
-    const fundsRaw = getFirst(d, ['funds','pools','vaults']);
-    const gurusRaw = getFirst(d, ['gurus','managers','strategists']);
-    const tvlRawAny = tvlRaw != null ? tvlRaw : getFirst(root, ['tvl','tvlUsd','tvl_usd','totalValueLocked','total_value_locked']);
-    const invRawAny = invRaw != null ? invRaw : getFirst(root, ['investors','users','wallets','holders']);
-    const fundsRawAny = fundsRaw != null ? fundsRaw : getFirst(root, ['funds','pools','vaults']);
-    const gurusRawAny = gurusRaw != null ? gurusRaw : getFirst(root, ['gurus','managers','strategists']);
-
-    // Numbers (for formatting), tolerate strings with suffixes
-    let tvlNum = parseHumanNumber(tvlRawAny);
-    const invNum = parseHumanNumber(invRawAny);
-    const fundsNum = parseHumanNumber(fundsRawAny);
-    const gurusNum = parseHumanNumber(gurusRawAny);
-
-    // Heuristic: if TVL is a small plain number without suffix, treat as millions for display
-    try {
-      const s0 = String(tvlRawAny || '').trim();
-      const s = s0.replace(/^[\$€£¥]/, '').trim();
-      const hasSuffix = /[KMB]/i.test(s);
-      const plainNumeric = /^\s*[\d,]+(?:\.\d+)?\s*$/.test(s);
-      if (tvlNum != null && !hasSuffix && plainNumeric && tvlNum < 1000) {
-        // Keep numeric as-is for optional math, but display with 'M' explicitly
-        if (tvlEl) tvlEl.textContent = '$' + Number(s.replace(/[^0-9.\-]/g,'')).toFixed(2) + 'M';
-      } else if (tvlEl && tvlNum != null) {
-        tvlEl.textContent = (typeof formatUSD === 'function' ? formatUSD(tvlNum) : ('$' + tvlNum.toLocaleString()));
-      }
-    } catch {
-      if (tvlEl && tvlNum != null) tvlEl.textContent = (typeof formatUSD === 'function' ? formatUSD(tvlNum) : ('$' + tvlNum.toLocaleString()));
+    // Set values
+    if (tvlEl && tvlVal != null && isFinite(tvlVal)) {
+      tvlEl.textContent = (typeof formatUSD === 'function')
+        ? formatUSD(tvlVal)
+        : ('$' + Number(tvlVal).toLocaleString());
     }
-
-    if (invEl && invNum != null) invEl.textContent = invNum.toLocaleString();
-    if (fundsEl && fundsNum != null) fundsEl.textContent = fundsNum.toLocaleString();
-    if (gurusEl && gurusNum != null) gurusEl.textContent = gurusNum.toLocaleString();
+    if (invEl && isFinite(investors)) invEl.textContent = investors.toLocaleString();
+    if (fundsEl && isFinite(funds)) fundsEl.textContent = funds.toLocaleString();
+    if (gurusEl && isFinite(gurus)) gurusEl.textContent = gurus.toLocaleString();
   } catch (err) {
     console.error('Guru stats load failed:', err);
   }
