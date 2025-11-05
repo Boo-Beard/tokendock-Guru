@@ -742,19 +742,17 @@ ease;
 .verified-corner i { color: #0E1116; }
 
 /* === FONT DEFINITIONS === */
-@font-face {
-  font-family: 'Low Batt';
-  src: url('../assets/fonts/low-batt.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
+/* place this AT THE TOP of the CSS that is included in the <head> */
+@font-face{
+  font-family: 'DepartureMono';
+  src: url('/assets/fonts/departure-mono.woff2') format('woff2');
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Departure Mono';
-  src: url('../assets/fonts/departure-mono.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
+/* only keep this if you truly use LowBatt somewhere; otherwise delete it */
+@font-face{
+  font-family: 'LowBatt';
+  src: url('/assets/fonts/low-batt.otf') format('opentype');
   font-display: swap;
 }
 

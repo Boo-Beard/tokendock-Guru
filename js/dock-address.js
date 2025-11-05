@@ -1838,7 +1838,7 @@ async function loadGuruStats() {
     }
 
     // 2) Fetch with retry/backoff and timeout; prefer same-origin proxy if configured
-const tryUrls = [`${MOUNT_BASE}/api/guru`, 'https://tokendock-guru.vercel.app/api/guru'];
+const tryUrls = [`${MOUNT_BASE}/api/guru`, 'https://tokendock-guru.vercel.app'];
     let json = null;
     let lastErr = null;
     for (let attempt = 0; attempt < 3; attempt++) {
