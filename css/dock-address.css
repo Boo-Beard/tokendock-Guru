@@ -1,5 +1,19 @@
 /* Theme variables are now controlled by config.js (applied in boot.js). */
 
+/* === FONT DEFINITIONS === */
+/* place this AT THE TOP of the CSS that is included in the <head> */
+@font-face{
+  font-family: 'DepartureMono';
+  src: url('/assets/fonts/departure-mono.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* only keep this if you truly use LowBatt somewhere; otherwise delete it */
+@font-face{
+  font-family: 'LowBatt';
+  src: url('/assets/fonts/low-batt.otf') format('opentype');
+  font-display: swap;
+}
 /* Skeleton shimmer */
 .skeleton { position: relative; overflow: hidden; }
 .skeleton .shimmer { position: relative; background: rgba(255,255,255,0.06); border-radius: 8px; }
@@ -743,20 +757,6 @@ ease;
 }
 .verified-corner i { color: #0E1116; }
 
-/* === FONT DEFINITIONS === */
-/* place this AT THE TOP of the CSS that is included in the <head> */
-@font-face{
-  font-family: 'DepartureMono';
-  src: url('/assets/fonts/departure-mono.woff2') format('woff2');
-  font-display: swap;
-}
-
-/* only keep this if you truly use LowBatt somewhere; otherwise delete it */
-@font-face{
-  font-family: 'LowBatt';
-  src: url('/assets/fonts/low-batt.otf') format('opentype');
-  font-display: swap;
-}
 
 /* === Guru Fund Section === */
 .guru-section {
