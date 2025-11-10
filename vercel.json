@@ -1,0 +1,9 @@
+"headers": [
+  {
+    "source": "/assets/fonts/(.*)",
+    "headers": [
+      { "key": "Access-Control-Allow-Origin", "value": "*" },
+      { "key": "Content-Type", "value": "font/woff2" }
+    ]
+  }
+]
