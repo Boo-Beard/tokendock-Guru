@@ -107,11 +107,11 @@ export default {
   // External links for the project
   socials: {
     // Twitter/X profile URL
-    twitter: 'https://x.com/ZeraLabs',
+    twitter: 'https://x.com/thegurufund',
     // Telegram group/channel URL
-    telegram: 'https://t.me/ZeraTG',
+    telegram: 'https://t.me/guruportal',
     // Main website URL
-    website: 'https://zeralabs.org/',
+    website: 'https://guru.fund/',
     // Medium or blog URL
     medium: '',
     // GitHub organization/user URL
@@ -133,11 +133,11 @@ export default {
   // Market links rendered as small logo chips
   marketLinks: {
     // Dexscreener logo, label and URL
-    dexscreener: { label: 'Dexscreener', url: 'https://dexscreener.com/solana/nn9vmhjtqgg9l9f8sp3geufwc5zvuhradcwehh7n7di', logoUrl: 'https://dexscreener.com/favicon.png' },
+    dexscreener: { label: 'Dexscreener', url: 'https://dexscreener.com/ethereum/0x0b11288843e14e43484cd62d7eba1ba20b4ac977', logoUrl: 'https://dexscreener.com/favicon.png' },
     // Birdeye logo, label and URL
-    birdeye: { label: 'Birdeye', url: 'https://birdeye.so/solana/token/8avjtjHAHFqp4g2RR9ALAGBpSTqKPZR8nRbzSTwZERA', logoUrl: 'https://birdeye.so/favicon.ico' },
+    birdeye: { label: 'Birdeye', url: 'https://birdeye.so/ethereum/token/0xaA7D24c3E14491aBaC746a98751A4883E9b70843/0x0B11288843e14E43484Cd62d7EBA1bA20b4Ac977', logoUrl: 'https://birdeye.so/favicon.ico' },
     // Dextools logo, label and URL
-    dextools: { label: 'Dextools', url: 'https://www.dextools.io/app/en/solana/pair-explorer/Nn9VMHJTqgG9L9F8SP3GEuFWC5zVuHrADCwehh7N7Di?t=1762235661354', logoUrl: 'https://www.dextools.io/app/favicon.ico' }
+    dextools: { label: 'Dextools', url: 'https://www.dextools.io/app/en/token/guru?t=1762800892769', logoUrl: 'https://www.dextools.io/app/favicon.ico' }
   },
 
   // Native/wrapped native token addresses per chain
