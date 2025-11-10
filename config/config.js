@@ -29,7 +29,7 @@ export default {
     // Background mode: 'color' or 'video'
     type: 'color',
     // Solid color override (null uses theme --bg-dark)
-    color: "linear-gradient(to bottom, color-mix(in oklab, #0357df 60%, #0a0f1c 40%) 0%, color-mix(in oklab, #166fff 70%, #0a0f1c 30%) 60%, color-mix(in oklab, #ff0040 50%, #0a0f1c 50%) 100%)",
+    color: "#1e293b",
     // Optional background video URL
     videoUrl: '',
     // Opacity applied to background media
